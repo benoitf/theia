@@ -53,7 +53,7 @@ export class GitWidget extends GitBaseWidget {
         @inject(LabelProvider) protected readonly labelProvider: LabelProvider,
         @inject(CommandService) protected readonly commandService: CommandService,
         @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService) {
-        super();
+        super(repositoryProvider, labelProvider);
         this.id = 'theia-gitContainer';
         this.title.label = 'Git';
 

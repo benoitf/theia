@@ -1,0 +1,55 @@
+.theia-git .commitListContainer .commitList .commitListElement {
+    margin: 3px 0;
+}
+
+.theia-git .commitListElement {
+    border-bottom: 1px solid var(--theia-layout-color4);
+}
+
+.theia-git .commitListElement .containerHead {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.theia-git .commitListElement .containerHead:hover {
+    cursor: pointer;
+}
+
+.theia-git .commitListElement .containerHead .headContent {
+    display: flex;
+    width: calc(100% - 16px);
+    margin: 0 8px;
+    justify-content: space-between;
+}
+
+.theia-git .commitListElement .containerHead .headContent .headLabelContainer{
+    width: calc(100% - 50px);
+}
+
+.theia-git .commitListElement .containerHead .headContent .expansionToggle{
+    display: flex;
+    align-items: center;
+}
+
+.theia-git .commitListElement .containerHead .headContent .expansionToggle > .toggle{
+    display: flex;
+    background: black;
+    padding: 5px;
+    border-radius: 7px;
+    margin-left: 5px;
+}
+
+.theia-git .commitBody {
+    padding: 5px;
+}
+
+.theia-git .commitFileList .theia-header {
+    margin-top: 5px;
+} 
+
+.theia-git .commitTime {
+    color: var(--theia-ui-font-color2);
+    font-size: smaller;
+}
