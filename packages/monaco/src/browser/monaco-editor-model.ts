@@ -8,7 +8,7 @@
 import { TextDocumentSaveReason, Position } from "vscode-languageserver-types";
 import { MonacoToProtocolConverter, ProtocolToMonacoConverter } from "monaco-languageclient";
 import { TextEditorDocument } from "@theia/editor/lib/browser";
-import { DisposableCollection, Disposable, Emitter, Event, Resource, CancellationTokenSource } from '@theia/core/lib/common';
+import { DisposableCollection, Disposable, Emitter, Event, Resource, CancellationTokenSource, CancellationToken } from '@theia/core';
 import ITextEditorModel = monaco.editor.ITextEditorModel;
 
 export {
@@ -136,7 +136,7 @@ export class MonacoEditorModel implements ITextEditorModel, TextEditorDocument {
     }
 
     save(): Promise<void> {
-        return this.doSave(TextDocumentSaveReason.Manual);
+        return this.scheduleSave(TextDocumentSaveReason.Manual);
     }
 
     protected syncCancellationTokenSource = new CancellationTokenSource();
@@ -158,12 +158,25 @@ export class MonacoEditorModel implements ITextEditorModel, TextEditorDocument {
             return;
         }
 
-        this.model.applyEdits([this.p2m.asTextEdit({
+        this.applyEdits([this.p2m.asTextEdit({
             range: this.m2p.asRange(this.model.getFullModelRange()),
             newText
         }) as monaco.editor.IIdentifiedSingleEditOperation]);
     }
+
+    protected ignoreEdits = false;
+    protected applyEdits(operations: monaco.editor.IIdentifiedSingleEditOperation[]): monaco.editor.IIdentifiedSingleEditOperation[] {
+        this.ignoreEdits = true;
+        try {
+            return this.model.applyEdits(operations);
+        } finally {
+            this.ignoreEdits = false;
+        }
+    }
     protected markAsDirty(): void {
+        if (this.ignoreEdits) {
+            return;
+        }
         this.syncCancellationTokenSource.cancel();
         this.setDirty(true);
         this.doAutoSave();
@@ -173,7 +186,7 @@ export class MonacoEditorModel implements ITextEditorModel, TextEditorDocument {
         if (this.autoSave === 'on') {
             this.toDisposeOnAutoSave.dispose();
             const handle = window.setTimeout(() => {
-                this.doSave(TextDocumentSaveReason.AfterDelay);
+                this.scheduleSave(TextDocumentSaveReason.AfterDelay);
             }, this.autoSaveDelay);
             this.toDisposeOnAutoSave.push(Disposable.create(() =>
                 window.clearTimeout(handle))
@@ -181,26 +194,51 @@ export class MonacoEditorModel implements ITextEditorModel, TextEditorDocument {
         }
     }
 
-    protected async doSave(reason: TextDocumentSaveReason): Promise<void> {
-        if (this.resource.saveContents) {
-            await this.fireWillSaveModel(reason);
-            if (this.dirty) {
-                const content = this.model.getValue();
-                await this.resource.saveContents(content);
-                this.setDirty(false);
+    protected saved: Promise<void> = Promise.resolve();
+    protected saveCancellationTokenSource = new CancellationTokenSource();
+    protected scheduleSave(reason: TextDocumentSaveReason): Promise<void> {
+        this.saveCancellationTokenSource.cancel();
+        this.saveCancellationTokenSource = new CancellationTokenSource();
+        const token = this.saveCancellationTokenSource.token;
+        return this.saved = this.saved.then(() => this.doSave(reason, token));
+    }
+
+    protected async doSave(reason: TextDocumentSaveReason, token: CancellationToken): Promise<void> {
+        try {
+            if (token.isCancellationRequested || !this.resource.saveContents) {
+                return;
             }
+
+            await this.fireWillSaveModel(reason, token);
+            if (token.isCancellationRequested && !this.dirty) {
+                return;
+            }
+
+            const content = this.model.getValue();
+            await this.resource.saveContents(content);
+            if (token.isCancellationRequested) {
+                return;
+            }
+
+            this.setDirty(false);
             this.onDidSaveModelEmitter.fire(this.model);
+        } catch (e) {
+            console.error('Document saving failed with the error:', e);
         }
     }
 
-    protected fireWillSaveModel(reason: TextDocumentSaveReason): Promise<void> {
+    protected fireWillSaveModel(reason: TextDocumentSaveReason, token: CancellationToken): Promise<void> {
         const model = this.model;
         return new Promise<void>(resolve => {
             this.onWillSaveModelEmitter.fire({
                 model, reason,
                 waitUntil: thenable =>
                     thenable.then(operations => {
-                        model.applyEdits(operations);
+                        if (token.isCancellationRequested) {
+                            resolve();
+                        }
+                        const invertedOperations = this.applyEdits(operations);
+                        token.onCancellationRequested(() => this.applyEdits(invertedOperations));
                         resolve();
                     })
             });
