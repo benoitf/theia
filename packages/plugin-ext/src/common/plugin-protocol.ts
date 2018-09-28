@@ -65,13 +65,13 @@ export interface PluginPackageViewContainer {
 }
 
 export interface PluginPackageView {
-	id: string;
-	name: string;
+    id: string;
+    name: string;
 }
 
 export interface PluginPackageMenu {
-	command: string;
-	group?: string;
+    command: string;
+    group?: string;
 }
 
 export interface PluginPackageGrammarsContribution {
@@ -372,16 +372,16 @@ export interface ViewContainer {
  * View contribution
  */
 export interface View {
-	id: string;
-	name: string;
+    id: string;
+    name: string;
 }
 
 /**
  * Menu contribution
  */
 export interface Menu {
-	command: string;
-	group?: string;
+    command: string;
+    group?: string;
 }
 
 /**
@@ -479,4 +479,12 @@ export interface PluginServer {
      * Deploy a plugin
      */
     deploy(pluginEntry: string): Promise<void>
+}
+
+export const ServerPluginRunner = Symbol('ServerPluginRunner');
+export interface ServerPluginRunner {
+    acceptMessage(jsonMessage: any): boolean;
+    onMessage(jsonMessage: any): void;
+    setClient(client: HostedPluginClient): void;
+    setDefault(defaultRunner: ServerPluginRunner): void;
 }

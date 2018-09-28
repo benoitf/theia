@@ -29,6 +29,7 @@
     "@theia/output": "^0.3.15",
     "@theia/plugin-ext": "^0.3.15",
     "@theia/plugin-ext-vscode": "^0.3.15",
+    "@theia/plugin-ext-remote": "^0.3.15",
     "@theia/preferences": "^0.3.15",
     "@theia/preview": "^0.3.15",
     "@theia/process": "^0.3.15",
