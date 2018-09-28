@@ -18,6 +18,7 @@ import { RPCProtocol } from '../api/rpc-protocol';
 import { Disposable } from '@theia/core/lib/common/disposable';
 import { LogPart } from './types';
 import { CharacterPair, CommentRule, PluginAPIFactory, Plugin } from '../api/plugin-api';
+import { interfaces } from 'inversify';
 
 export const hostedServicePath = '/services/hostedPlugin';
 
@@ -479,4 +480,18 @@ export interface PluginServer {
      * Deploy a plugin
      */
     deploy(pluginEntry: string): Promise<void>
+}
+
+// Allow to Delegate loading of plugins to an external entity
+export const BrowserPluginLoader = Symbol('BrowserPluginLoader');
+export interface BrowserPluginLoader {
+    loadPlugins(pluginsMetadata: PluginMetadata[], container: interfaces.Container, frontend: boolean, backend: boolean): void;
+}
+
+export const ServerPluginRunner = Symbol('ServerPluginRunner');
+export interface ServerPluginRunner {
+    acceptMessage(jsonMessage: any): boolean;
+    onMessage(jsonMessage: any): void;
+    setClient(client: HostedPluginClient): void;
+    setDefault(defaultRunner: ServerPluginRunner): void;
 }

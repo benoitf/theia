@@ -25,7 +25,7 @@ import { HostedPluginWatcher } from '../../hosted/browser/hosted-plugin-watcher'
 import { HostedPluginLogViewer } from '../../hosted/browser/hosted-plugin-log-viewer';
 import { HostedPluginManagerClient } from '../../hosted/browser/hosted-plugin-manager-client';
 import { PluginApiFrontendContribution } from './plugin-frontend-contribution';
-import { HostedPluginServer, hostedServicePath, PluginServer, pluginServerJsonRpcPath } from '../../common/plugin-protocol';
+import { HostedPluginServer, hostedServicePath, PluginServer, pluginServerJsonRpcPath, BrowserPluginLoader } from '../../common/plugin-protocol';
 import { ModalNotification } from './dialogs/modal-notification';
 import { PluginWidget } from './plugin-ext-widget';
 import { PluginFrontendViewContribution } from './plugin-frontend-view-contribution';
@@ -33,6 +33,7 @@ import { PluginFrontendViewContribution } from './plugin-frontend-view-contribut
 import { HostedPluginInformer } from '../../hosted/browser/hosted-plugin-informer';
 import { bindHostedPluginPreferences } from '../../hosted/browser/hosted-plugin-preferences';
 import { HostedPluginController } from '../../hosted/browser/hosted-plugin-controller';
+import { BrowserPluginLoaderImpl } from '../../hosted/browser/hosted-plugin-browser-loader';
 
 import '../../../src/main/browser/style/index.css';
 import { PluginExtDeployCommandService } from './plugin-ext-deploy-command';
@@ -94,4 +95,5 @@ export default new ContainerModule(bind => {
     bind(MenusContributionPointHandler).toSelf().inSingletonScope();
 
     bind(PluginContributionHandler).toSelf().inSingletonScope();
+    bind(BrowserPluginLoader).to(BrowserPluginLoaderImpl).inSingletonScope();
 });
