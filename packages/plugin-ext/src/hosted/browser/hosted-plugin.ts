@@ -13,9 +13,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { injectable, inject, interfaces } from 'inversify';
+import { injectable, inject, interfaces, optional } from 'inversify';
 import { PluginWorker } from '../../main/browser/plugin-worker';
-import { HostedPluginServer, PluginMetadata } from '../../common/plugin-protocol';
+import { HostedPluginServer, PluginMetadata, BrowserPluginLoader } from '../../common/plugin-protocol';
 import { HostedPluginWatcher } from './hosted-plugin-watcher';
 import { MAIN_RPC_CONTEXT } from '../../api/plugin-api';
 import { setUpPluginApi } from '../../main/browser/main-context';
@@ -40,6 +40,10 @@ export class HostedPluginSupport {
 
     @inject(PluginContributionHandler)
     private readonly contributionHandler: PluginContributionHandler;
+
+    @inject(BrowserPluginLoader)
+    @optional()
+    private readonly pluginLoader: BrowserPluginLoader;
 
     private theiaReadyPromise: Promise<any>;
 
@@ -67,6 +71,10 @@ export class HostedPluginSupport {
 
     loadPlugins(pluginsMetadata: PluginMetadata[], container: interfaces.Container): void {
         const [frontend, backend] = this.initContributions(pluginsMetadata);
+        if (this.pluginLoader) {
+            this.pluginLoader.loadPlugins(pluginsMetadata, container, frontend, backend);
+            return;
+        }
         this.theiaReadyPromise.then(() => {
             if (frontend) {
                 this.worker = new PluginWorker();
