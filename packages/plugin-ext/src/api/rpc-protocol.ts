@@ -62,7 +62,8 @@ export class RPCProtocolImpl implements RPCProtocol {
     private readonly pendingRPCReplies: { [msgId: string]: Deferred<any>; };
     private readonly multiplexor: RPCMultiplexer;
 
-    constructor(connection: MessageConnection) {
+
+    constructor(readonly connection: MessageConnection, readonly pluginID?: string) {
         this.isDisposed = false;
         // tslint:disable-next-line:no-null-keyword
         this.locals = Object.create(null);
@@ -109,7 +110,8 @@ export class RPCProtocolImpl implements RPCProtocol {
         const result = new Deferred();
 
         this.pendingRPCReplies[callId] = result;
-        this.multiplexor.send(MessageFactory.request(callId, proxyId, methodName, args));
+        const idPlugin = this.pluginID ? this.pluginID : "";
+        this.multiplexor.send(MessageFactory.request(callId, proxyId, idPlugin, methodName, args));
         return result.promise;
     }
 
@@ -119,6 +121,11 @@ export class RPCProtocolImpl implements RPCProtocol {
         }
 
         const msg = <RPCMessage>JSON.parse(rawmsg);
+        const pluginMessageId = (<any>msg).pluginID;
+        // not matching pluginID, skip it
+        if (this.pluginID && pluginMessageId && pluginMessageId.length > 0 && pluginMessageId !== this.pluginID) {
+            return;
+        }
 
         switch (msg.type) {
             case MessageType.Request:
@@ -252,8 +259,8 @@ class RPCMultiplexer {
 
 class MessageFactory {
 
-    public static request(req: string, rpcId: string, method: string, args: any[]): string {
-        return `{"type":${MessageType.Request},"id":"${req}","proxyId":"${rpcId}","method":"${method}","args":${JSON.stringify(args)}}`;
+    public static request(req: string, rpcId: string, pluginID: string, method: string, args: any[]): string {
+        return `{"type":${MessageType.Request},"id":"${req}","proxyId":"${rpcId}","pluginID":"${pluginID}","method":"${method}","args":${JSON.stringify(args)}}`;
     }
 
     public static replyOK(req: string, res: any): string {

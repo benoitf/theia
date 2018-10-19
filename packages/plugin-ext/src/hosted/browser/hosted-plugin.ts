@@ -106,15 +106,15 @@ export class HostedPluginSupport {
     }
 
     private createServerRpc(pluginMetadata: PluginMetadata): RPCProtocol {
+        const pluginID = getPluginId(pluginMetadata.model);
         return new RPCProtocolImpl({
             onMessage: this.watcher.onPostMessageEvent,
             send: message => {
-                const pluginID = getPluginId(pluginMetadata.model);
                 const wrappedMessage: any = {};
                 wrappedMessage['pluginID'] = pluginID;
                 wrappedMessage['content'] = message;
                 this.server.onMessage(JSON.stringify(wrappedMessage));
             }
-        });
+        }, pluginID);
     }
 }

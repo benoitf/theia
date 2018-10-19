@@ -15,45 +15,58 @@
  ********************************************************************************/
 
 import { PluginManagerExtImpl } from '../../plugin/plugin-manager';
-import { MAIN_RPC_CONTEXT, Plugin, PluginAPIFactory } from '../../api/plugin-api';
+import { MAIN_RPC_CONTEXT, Plugin } from '../../api/plugin-api';
 import { PluginMetadata } from '../../common/plugin-protocol';
 import { createAPIFactory } from '../../plugin/plugin-context';
 import { EnvExtImpl } from '../../plugin/env';
 import { PreferenceRegistryExtImpl } from '../../plugin/preference-registry';
+import { RPCProtocolImpl } from '../../api/rpc-protocol';
+import { RPCProtocol } from '../../api/rpc-protocol';
+import { getPluginId } from '../../common';
 
 /**
  * Handle the RPC calls.
  */
 export class PluginHostRPC {
 
-    private static apiFactory: PluginAPIFactory;
 
     private pluginManager: PluginManagerExtImpl;
+    envExt: EnvExtImpl;
+    preferenceRegistryExt: PreferenceRegistryExtImpl;
 
-    constructor(protected readonly rpc: any) {
+    constructor(protected readonly rpc: RPCProtocol) {
     }
 
     initialize() {
-        const envExt = new EnvExtImpl(this.rpc);
-        const preferenceRegistryExt = new PreferenceRegistryExtImpl(this.rpc);
-        this.pluginManager = this.createPluginManager(envExt, preferenceRegistryExt);
+        this.envExt = new EnvExtImpl(this.rpc);
+        this.preferenceRegistryExt = new PreferenceRegistryExtImpl(this.rpc);
+        this.pluginManager = this.createPluginManager(this.envExt, this.preferenceRegistryExt);
         this.rpc.set(MAIN_RPC_CONTEXT.HOSTED_PLUGIN_MANAGER_EXT, this.pluginManager);
-        this.rpc.set(MAIN_RPC_CONTEXT.PREFERENCE_REGISTRY_EXT, preferenceRegistryExt);
-        PluginHostRPC.apiFactory = createAPIFactory(this.rpc, this.pluginManager, envExt, preferenceRegistryExt);
+        this.rpc.set(MAIN_RPC_CONTEXT.PREFERENCE_REGISTRY_EXT, this.preferenceRegistryExt);
+
     }
 
     // tslint:disable-next-line:no-any
-    static initialize(contextPath: string, plugin: Plugin): any {
+    initializePlugin(contextPath: string, plugin: Plugin): any {
         console.log('PLUGIN_HOST(' + process.pid + '): initializing(' + contextPath + ')');
         try {
             const backendInit = require(contextPath);
-            backendInit.doInitialization(PluginHostRPC.apiFactory, plugin);
+
+            //RPC per plug-in
+            const rpcPlugin: RPCProtocol = new RPCProtocolImpl((<RPCProtocolImpl>this.rpc).connection, getPluginId(plugin.model))
+            rpcPlugin.set(MAIN_RPC_CONTEXT.HOSTED_PLUGIN_MANAGER_EXT, this.pluginManager);
+            rpcPlugin.set(MAIN_RPC_CONTEXT.PREFERENCE_REGISTRY_EXT, this.preferenceRegistryExt);
+
+            const apiFactory = createAPIFactory(rpcPlugin, this.pluginManager, this.envExt, this.preferenceRegistryExt);
+            backendInit.doInitialization(apiFactory, plugin);
         } catch (e) {
             console.error(e);
         }
     }
 
     createPluginManager(envExt: EnvExtImpl, preferencesManager: PreferenceRegistryExtImpl): PluginManagerExtImpl {
+
+        const internal = this;
         const pluginManager = new PluginManagerExtImpl({
             loadPlugin(plugin: Plugin): void {
                 console.log('PLUGIN_HOST(' + process.pid + '): PluginManagerExtImpl/loadPlugin(' + plugin.pluginPath + ')');
@@ -86,7 +99,7 @@ export class PluginHostRPC {
                             rawModel: plg.source
                         };
 
-                        PluginHostRPC.initialize(backendInitPath, plugin);
+                        internal.initializePlugin(backendInitPath, plugin);
 
                         result.push(plugin);
                     } else {
