@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <font id="che" horiz-adv-x="70">
+    <font-face font-family="che"
+      units-per-em="100" ascent="100"
+      descent="0" />
+    <missing-glyph horiz-adv-x="0" />
+    <glyph glyph-name="che-logo"
+      unicode="&#xE001;"
+      horiz-adv-x="100" d="M15.8674671428571 55.8857142857143L15.8214285714285 80.2957142857143L49.8971428571428 100L83.8914285714286 80.3085714285714L62.9042857142857 68.1514285714286L49.9585714285714 75.45L15.8671428571429 55.8857142857143zM15.8214285714285 38.0642857142857L49.93 18.6042857142857L84.1785714285715 38.5142857142857V62.66L49.93 43.3657142857143L15.8214285714285 62.66V38.0642857142857z" />
+  </font>
+</defs>
+</svg>

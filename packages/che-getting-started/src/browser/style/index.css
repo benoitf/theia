@@ -1,0 +1,121 @@
+/********************************************************************************
+ * Copyright (C) 2018 Ericsson and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is available at
+ * https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
+
+html, body {
+    font-family: var(--theia-ui-font-family);
+}
+
+.che-welcome-header .che-welcome-header-title img {
+    height: 60px;
+    margin-right: 5px;
+}
+
+.che-welcome-header .che-welcome-header-title .svg-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.che-welcome-command-desc {
+    display: flex;
+}
+
+.che-welcome-command-desc .monaco-keybinding {
+    margin-left: 10px;
+    
+}
+.che-welcome-command-desc .monaco-keybinding-key {
+    margin-right: 5px;
+}
+
+.che-welcome-header .che-welcome-header-title {
+    color: var(--theia-ui-font-color0);
+    font-size: 3.5em;
+    white-space: nowrap;
+    font-weight: 400;
+    margin-block-end: 10px;
+    margin-block-start: 10px;
+    display: flex;
+}
+
+.che-welcome-header-subtitle {
+    color: var(--theia-ui-font-color2);
+    font-size: 2.5em;
+    text-transform: capitalize;
+    font-weight: 400;
+}
+
+.cheico-logo {
+    color: var(--theia-accent-color1);
+    margin-top: -1px;
+    margin-right: 1px;
+    font-size: var(--theia-ui-font-size2);
+}
+
+
+
+
+.col {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-grid {
+    display: flex;
+}
+
+.che-welcome-action-container {
+    line-height: 20px;
+    color: var(--theia-ui-font-color0);
+}
+
+.che-welcome-action-details {
+    padding-left: 5px;
+    color: var(--theia-ui-font-color1);
+}
+
+.che-welcome-container {
+    padding: 20px;
+}
+
+.che-welcome-section {
+    margin-top: 25px;
+}
+
+.che-welcome-section a {
+    border: none;
+    color: var(--theia-accent-color1);
+    font-weight: 500;
+    outline: 0;
+    text-decoration: none;
+}
+
+.che-welcome-section a:hover {
+    text-decoration: underline;
+}
+
+.che-welcome-section-header {
+    color: var(--theia-ui-font-color0);
+    font-size: var(--theia-ui-font-size2);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.che-welcome-section-header i {
+    padding-right: 5px;
+}
+

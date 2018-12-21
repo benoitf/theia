@@ -1,0 +1,24 @@
+@font-face {
+	font-family: "che";
+	src: url('../fonts/che.eot');
+	src: url('../fonts/che.eot?#iefix') format('eot'),
+		url('../fonts/che.woff') format('woff'),
+		url('../fonts/che.ttf') format('truetype'),
+		url('../fonts/che.svg#che') format('svg');
+}
+
+.chefont:before {
+	font-family: "che";
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: normal;
+	/* speak: none; only necessary if not using the private unicode range (firstGlyph option) */
+	text-decoration: none;
+	text-transform: none;
+}
+
+.cheico-logo:before {
+    content: "\E001";
+}
