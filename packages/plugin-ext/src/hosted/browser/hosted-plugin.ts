@@ -328,6 +328,10 @@ export class HostedPluginSupport {
         return hostContributions;
     }
 
+    sleep(ms: any) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     protected async startPlugins(contributionsByHost: Map<PluginHost, PluginContributions[]>, toDisconnect: DisposableCollection): Promise<void> {
         let started = 0;
         const startPluginsMeasurement = this.createMeasurement('startPlugins');
@@ -342,15 +346,19 @@ export class HostedPluginSupport {
         const thenable: Promise<void>[] = [];
         const configStorage = { hostLogPath, hostStoragePath };
         for (const [host, hostContributions] of contributionsByHost) {
+            console.log('start deploy....on host', host);
             const manager = await this.obtainManager(host, hostContributions, toDisconnect);
             if (!manager) {
                 return;
             }
+
             const plugins = hostContributions.map(contributions => contributions.plugin.metadata);
             thenable.push((async () => {
                 try {
                     const activationEvents = [...this.activationEvents];
+                    console.log('await manager.start...', host);
                     await manager.$start({ plugins, configStorage, activationEvents });
+                    console.log('end manager.start...', host);
                     if (toDisconnect.disposed) {
                         return;
                     }
@@ -372,7 +380,9 @@ export class HostedPluginSupport {
                 }
             })());
         }
+        console.log('await wait all thenale');
         await Promise.all(thenable);
+        console.log('end wait all thenale');
         if (toDisconnect.disposed) {
             return;
         }
@@ -434,7 +444,7 @@ export class HostedPluginSupport {
         return rpc;
     }
 
-    private createServerRpc(pluginID: string, hostID: string): RPCProtocol {
+    protected createServerRpc(pluginID: string, hostID: string): RPCProtocol {
         return new RPCProtocolImpl({
             onMessage: this.watcher.onPostMessageEvent,
             send: message => {

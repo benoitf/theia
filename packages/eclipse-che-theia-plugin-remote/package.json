@@ -1,0 +1,36 @@
+{
+  "name": "@theia/plugin-remote",
+  "version": "0.15.0",
+  "author": "Florent Benoit",
+  "license": "EPL-2.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "lint": "theiaext lint",
+    "build": "theiaext build",
+    "watch": "theiaext watch",
+    "clean": "theiaext clean",
+    "test": "theiaext test"
+  },
+  "devDependencies": {
+    "@theia/ext-scripts": "^0.15.0",
+    "@types/deasync": "^0.1.0"
+  },
+  "nyc": {
+    "extends": "../../configs/nyc.json"
+  },
+  "dependencies": {
+    "@theia/core": "^0.15.0",
+    "@theia/plugin-ext": "^0.15.0",
+    "@theia/plugin-ext-vscode": "^0.15.0",
+    "deasync": "^0.1.19"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/plugin-remote-frontend-module",
+      "backend": "lib/node/plugin-remote-backend-module"
+    }
+  ]
+}

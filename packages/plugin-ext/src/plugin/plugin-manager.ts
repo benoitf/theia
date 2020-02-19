@@ -162,6 +162,8 @@ export class PluginManagerExtImpl implements PluginManagerExt, PluginManager {
 
     async $start(params: PluginManagerStartParams): Promise<void> {
         const [plugins, foreignPlugins] = await this.host.init(params.plugins);
+        console.log('plugins are', plugins);
+        console.log('foreignPlugins are', foreignPlugins);
         // add foreign plugins
         for (const plugin of foreignPlugins) {
             this.registerPlugin(plugin, params.configStorage);
@@ -217,6 +219,7 @@ export class PluginManagerExtImpl implements PluginManagerExt, PluginManager {
     }
 
     protected async loadPlugin(plugin: Plugin, configStorage: ConfigStorage, visited = new Set<string>()): Promise<boolean> {
+        console.log('inside LOAD________PLUGIN_____', plugin.model.id);
         // in order to break cycles
         if (visited.has(plugin.model.id)) {
             return true;
@@ -276,6 +279,7 @@ export class PluginManagerExtImpl implements PluginManagerExt, PluginManager {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private async startPlugin(plugin: Plugin, configStorage: ConfigStorage, pluginMain: any): Promise<boolean> {
+        console.log('\n\n\n\n\n\nstartPlugin' + plugin.model.id);
         const subscriptions: theia.Disposable[] = [];
         const asAbsolutePath = (relativePath: string): string => join(plugin.pluginFolder, relativePath);
         const logPath = join(configStorage.hostLogPath, plugin.model.id); // todo check format
@@ -333,6 +337,7 @@ export class PluginManagerExtImpl implements PluginManagerExt, PluginManager {
         return Array.from(this.registry.values());
     }
     getPluginExport(pluginId: string): PluginAPI | undefined {
+        console.log('ask for pluginExports');
         const activePlugin = this.activatedPlugins.get(pluginId);
         if (activePlugin) {
             return activePlugin.exports;
@@ -353,16 +358,22 @@ export class PluginManagerExtImpl implements PluginManagerExt, PluginManager {
     }
 
     activatePlugin(pluginId: string): PromiseLike<void> {
+        console.log(`pluginManager.activatePlugin ${pluginId}`);
         if (this.pluginActivationPromises.has(pluginId)) {
+            console.log(`pluginManager.pluginActivationPromises ${pluginId} is true`);
             return this.pluginActivationPromises.get(pluginId)!.promise;
+        } else {
+            console.log(`pluginManager.pluginActivationPromises ${pluginId} is false`);
         }
 
         const deferred = new Deferred<void>();
 
         if (this.activatedPlugins.get(pluginId)) {
+            console.log(`pluginManager.activatedPlugins.get(${pluginId}) is true, resolving...`);
             deferred.resolve();
         }
         this.pluginActivationPromises.set(pluginId, deferred);
+        console.log(`pluginManager return deferred promise....`);
         return deferred.promise;
     }
 

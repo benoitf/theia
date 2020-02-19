@@ -44,7 +44,7 @@
     "postinstall": "node scripts/post-install.js",
     "prepare": "yarn prepare:travis && yarn prepare:build && yarn prepare:hoisting && yarn download:plugins",
     "prepare:travis": "node scripts/prepare-travis.js",
-    "prepare:build": "yarn build && run lint && run build \"@theia/example-*\" --stream --parallel",
+    "prepare:build": "yarn build && run build \"@theia/example-*\" --stream --parallel",
     "prepare:hoisting": "theia check:hoisted -s",
     "clean": "yarn lint:clean && node scripts/run-reverse-topo.js yarn clean",
     "build": "tsc -b configs/root-compilation.tsconfig.json --verbose",

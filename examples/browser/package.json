@@ -50,7 +50,8 @@
     "@theia/typehierarchy": "^0.15.0",
     "@theia/userstorage": "^0.15.0",
     "@theia/variable-resolver": "^0.15.0",
-    "@theia/workspace": "^0.15.0"
+    "@theia/workspace": "^0.15.0",
+    "@theia/plugin-remote": "^0.15.0"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn build",

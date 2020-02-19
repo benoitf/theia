@@ -61,7 +61,6 @@ export class PluginHostRPC {
         this.rpc.set(MAIN_RPC_CONTEXT.PREFERENCE_REGISTRY_EXT, preferenceRegistryExt);
         this.rpc.set(MAIN_RPC_CONTEXT.STORAGE_EXT, storageProxy);
         this.rpc.set(MAIN_RPC_CONTEXT.WEBVIEWS_EXT, webviewExt);
-
         this.apiFactory = createAPIFactory(
             this.rpc,
             this.pluginManager,
